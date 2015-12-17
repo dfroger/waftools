@@ -24,7 +24,8 @@ def get_conda_environments():
     return env_paths, active_env_path
 
 def options(opt):
-    group = opt.add_option_group('Conda environment configure options')
+    group = opt.add_option_group('Conda environment configure options. ' \
+        'Python and BOOST will be searched in conda environment.')
 
     group.add_option('--conda', action='store_true', default=False,
                    help='Set PKG_CONFIG_PATH and RPATH to conda environment')
@@ -45,9 +46,13 @@ def detect_conda(conf):
 
 @conf
 def conda_boost(conf):
-    if conf.env.USE_CONDA:
-        from waflib.extras import boost
-        boost.BOOST_INCLUDES.insert(0, conf.env.INCLUDES_CONDA_ENV)
+    from waflib.extras import boost
+    boost.BOOST_INCLUDES.insert(0, conf.env.INCLUDES_CONDA_ENV)
+
+@conf
+def conda_python(conf):
+    conf.env.LIBPATH_PYEMBED= conf.env.LIBPATH_CONDA_ENV
+    conf.env.LIBPATH_PYEXT = conf.env.LIBPATH_CONDA_ENV
 
 def configure(conf):
     o = conf.options
@@ -56,6 +61,8 @@ def configure(conf):
 
     if conf.env.USE_CONDA:
         conf.detect_conda()
+        conf.conda_boost()
+        conf.conda_python()
 
     if o.conda:
         os.environ['PKG_CONFIG_PATH'] = conf.env.PKG_CONFIG_PATH_ENV
