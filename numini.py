@@ -8,11 +8,11 @@ import clibtool
 tooldir = os.environ['WAF_TOOLDIR']
 
 fragment= """
-#include "numini.hxx"
+#include "numini/reader.hxx"
 
 int main()
 {
-    NumIni ini = NumIni();
+    numini::Reader ini;
 }
 """
 
